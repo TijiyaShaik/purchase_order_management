@@ -311,7 +311,6 @@ The application can be tested using the following scenarios:
 | Apply report filters                          | Matching records displayed               |
 
 ---
-## Repository Structure
 
 ## 📁 Repository Structure
 
@@ -361,7 +360,7 @@ Contains screenshots of different purchase order selection screens.
 
 ### 📂 4. Filters
 
-Contains filter implementations for purchase order and vendor-related data.
+Contains filter implementations and execution results for purchase order and vendor-related data.
 
 * `PO_Item_PO_Filter.txt`
 * `PO_Item_Vendor_Filter.txt`
@@ -375,10 +374,16 @@ Contains the main SAP ABAP project implementation.
 
 * `Z25_PO_MANAGEMENT`
 
+### 📂 6. Documentation
+
+Contains project documentation covering the application overview and database design.
+
+* `Project_Overview.pdf`
+* `Database_Design.pdf`
+
 ### 📄 README.md
 
-Provides the project overview, features, technologies used, implementation details, and application screenshots.
-
+Provides the project overview, objectives, features, technologies used, OOPs implementation, database design, execution instructions, and application screenshots.
 
 ## Future Enhancements
 

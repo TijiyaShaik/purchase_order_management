@@ -318,7 +318,6 @@ purchase_order_management/
 ├── README.md
 │
 ├── database_tables/
-│   │
 │   ├── materials_database.txt
 │   ├── material-structure.png
 │   ├── po_header-database.txt
@@ -331,7 +330,6 @@ purchase_order_management/
 │   └── vendor-structure.png
 │
 ├── execution/
-│   │
 │   ├── Invalid_Status_Transition.txt
 │   ├── PO_Add_Multiple_Items.txt
 │   ├── PO_Cancel_Success.txt
@@ -344,7 +342,6 @@ purchase_order_management/
 │   └── PO_Release_Success.txt
 │
 ├── Selection_screens/
-│   │
 │   ├── Create_PO_Selection_Screen.png
 │   ├── Display_PO_Selection_Screen.png
 │   ├── PO_Item_Selection_Screen.png
@@ -352,7 +349,6 @@ purchase_order_management/
 │   └── PO_Status_Selection_Screen.png
 │
 ├── Filters/
-│   │
 │   ├── PO_Item_PO_Filter.txt
 │   ├── PO_Item_Vendor_Filter.txt
 │   ├── PO_Overview_Date_Filter.txt
@@ -360,7 +356,6 @@ purchase_order_management/
 │   └── PO_Overview_Vendor_Filter.txt
 │
 └── source_code/
-    │
     └── Z25_PO_MANAGEMENT
 
 ## Future Enhancements

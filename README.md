@@ -1,4 +1,4 @@
-# SAP ABAP – Purchase Order Management System
+<img width="1920" height="1028" alt="material-structure" src="https://github.com/user-attachments/assets/32f170c9-24c2-48b1-bc9d-8679cb2a3077" /># SAP ABAP – Purchase Order Management System
 
 ## Project Overview
 
@@ -266,50 +266,7 @@ Example:
 
 ---
 
-## Project Screenshots
 
-Screenshots demonstrating the database design, ABAP implementation and application execution are available in the `Screenshots` folder.
-
-### Selection Screens
-
-Add screenshots demonstrating the different application operations.
-
-### Database Tables
-
-Add screenshots of:
-
-* Vendor Master
-* Material Master
-* Vendor-Material Relationship
-* Purchase Order Header
-* Purchase Order Items
-
-### ABAP OOPs Implementation
-
-Add screenshots demonstrating:
-
-* Validator Class
-* DAO Class
-* Service Class
-* Class Implementations
-* Dynamic Selection Screen
-  
-
-### Application Execution
-
-Add screenshots demonstrating:
-
-* Purchase Order Creation
-* Purchase Order Display
-* Status Management
-* Purchase Order Overview ALV
-* Purchase Order Item Overview ALV
-
-### ALV Reports
-
-Add screenshots demonstrating the header and item reports with their respective filters.
-
----
 
 ## How to Execute the Project
 
@@ -354,38 +311,57 @@ The application can be tested using the following scenarios:
 | Apply report filters                          | Matching records displayed               |
 
 ---
-
 ## Repository Structure
 
-```text
-SAP-ABAP-Purchase-Order-Management-System/
+purchase_order_management/
 │
 ├── README.md
 │
-├── Source_Code/
-│   └── Z25_PO_MANAGEMENT.abap
+├── database_tables/
+│   │
+│   ├── materials_database.txt
+│   ├── material-structure.png
+│   ├── po_header-database.txt
+│   ├── PO_header-structure.png
+│   ├── po_item-database.txt
+│   ├── PO_item-structure.png
+│   ├── vend-mat-structure.png
+│   ├── vend-mat-database.txt
+│   ├── vendor_database.txt
+│   └── vendor-structure.png
 │
-├── Database_tables/
-│   ├── Z
-│   ├── Z25MATERIAL
-│   ├── Z25VENDOR_MAT1
-│   ├── Z25PO_HEADER
-│   └── Z25PO_ITEM
+├── execution/
+│   │
+│   ├── Invalid_Status_Transition.txt
+│   ├── PO_Add_Multiple_Items.txt
+│   ├── PO_Cancel_Success.txt
+│   ├── PO_creation.txt
+│   ├── PO_display.txt
+│   ├── PO_Header_Database-rel.txt
+│   ├── PO_Item_Database-rel.txt
+│   ├── PO_Item_Overview_ALV.txt
+│   ├── PO_Overview_ALV.txt
+│   └── PO_Release_Success.txt
 │
-├── Screenshots/
-│   ├── 01_Selection_Screens/
-│   ├── 02_Database_Tables/
-│   ├── 03_ABAP_Program/
-│   ├── 04_Execution_Outputs/
-│   └── 05_ALV_Reports/
+├── Selection_screens/
+│   │
+│   ├── Create_PO_Selection_Screen.png
+│   ├── Display_PO_Selection_Screen.png
+│   ├── PO_Item_Selection_Screen.png
+│   ├── PO_Overview_Selection_Screen.png
+│   └── PO_Status_Selection_Screen.png
 │
-└── Documentation/
-    ├── Project_Overview.pdf
-    ├── Database_Design.pdf
-    └── Test_Cases.pdf
-```
-
----
+├── Filters/
+│   │
+│   ├── PO_Item_PO_Filter.txt
+│   ├── PO_Item_Vendor_Filter.txt
+│   ├── PO_Overview_Date_Filter.txt
+│   ├── PO_Overview_Status_Filter.txt
+│   └── PO_Overview_Vendor_Filter.txt
+│
+└── source_code/
+    │
+    └── Z25_PO_MANAGEMENT
 
 ## Future Enhancements
 

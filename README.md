@@ -1,4 +1,4 @@
-<img width="1920" height="1028" alt="material-structure" src="https://github.com/user-attachments/assets/32f170c9-24c2-48b1-bc9d-8679cb2a3077" /># SAP ABAP – Purchase Order Management System
+Purchase Order Management System
 
 ## Project Overview
 

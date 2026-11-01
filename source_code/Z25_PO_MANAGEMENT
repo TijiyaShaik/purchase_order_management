@@ -1,1 +1,1256 @@
 
+REPORT z25_po_management.
+
+* Purchase Order Management System
+* Features: PO creation, validation, display, status management,
+* header ALV overview and item-level ALV overview with dynamic filters.
+
+*---------------------------------------------------------------------*
+* 1. DISPLAY TYPES
+*---------------------------------------------------------------------*
+
+TYPES: BEGIN OF ty_po_header_display,
+         po_id         TYPE z25de_po_id,
+         vendor_id     TYPE z25de_vendor_id,
+         vendor_name   TYPE z25de_vendor_name,
+         po_date       TYPE datum,
+         delivery_date TYPE datum,
+         currency      TYPE waers,
+         total_amount  TYPE z25de_total_amount,
+         status        TYPE z25de_status,
+       END OF ty_po_header_display.
+
+TYPES: BEGIN OF ty_po_item_display,
+         item_no      TYPE z25de_item_no,
+         material_id  TYPE z25de_material_id,
+         material_name TYPE z25de_material_name,
+         quantity     TYPE z25de_quantity,
+         unit         TYPE meins,
+         unit_price   TYPE z25de_unit_price,
+         line_total   TYPE z25de_line_total,
+         currency     TYPE waers,
+       END OF ty_po_item_display.
+
+TYPES ty_po_item_table TYPE STANDARD TABLE OF ty_po_item_display
+                       WITH DEFAULT KEY.
+
+TYPES: BEGIN OF ty_po_overview,
+         po_id          TYPE z25de_po_id,
+         vendor_id      TYPE z25de_vendor_id,
+         vendor_name    TYPE z25de_vendor_name,
+         po_date        TYPE datum,
+         delivery_date  TYPE datum,
+         total_amount   TYPE z25de_total_amount,
+         currency       TYPE waers,
+         status         TYPE z25de_status,
+         status_text    TYPE char15,
+       END OF ty_po_overview.
+
+TYPES ty_po_overview_table TYPE STANDARD TABLE OF ty_po_overview
+                            WITH DEFAULT KEY.
+
+TYPES: BEGIN OF ty_po_item_overview,
+         po_id          TYPE z25de_po_id,
+         vendor_id      TYPE z25de_vendor_id,
+         vendor_name    TYPE z25de_vendor_name,
+         po_date        TYPE datum,
+         item_no        TYPE z25de_item_no,
+         material_id    TYPE z25de_material_id,
+         material_name  TYPE z25de_material_name,
+         quantity       TYPE z25de_quantity,
+         unit           TYPE meins,
+         unit_price     TYPE z25de_unit_price,
+         line_total     TYPE z25de_line_total,
+         currency       TYPE waers,
+         status         TYPE z25de_status,
+         status_text    TYPE char15,
+       END OF ty_po_item_overview.
+
+TYPES ty_po_item_overview_table TYPE STANDARD TABLE OF ty_po_item_overview
+                                WITH DEFAULT KEY.
+
+
+*---------------------------------------------------------------------*
+* 2. CLASS DEFINITION - PO VALIDATOR
+*---------------------------------------------------------------------*
+
+CLASS lcl_po_validator DEFINITION.
+
+  PUBLIC SECTION.
+
+    METHODS:
+      validate_vendor
+        IMPORTING iv_vendor_id TYPE z25de_vendor_id
+        RETURNING VALUE(rv_exists) TYPE abap_bool,
+
+      validate_material
+        IMPORTING iv_material_id TYPE z25de_material_id
+        RETURNING VALUE(rv_exists) TYPE abap_bool,
+
+      validate_quantity
+        IMPORTING iv_quantity TYPE z25de_quantity
+        RETURNING VALUE(rv_valid) TYPE abap_bool,
+
+      validate_vendor_material
+        IMPORTING
+          iv_vendor_id TYPE z25de_vendor_id
+          iv_material_id TYPE z25de_material_id
+        RETURNING VALUE(rv_exists) TYPE abap_bool.
+
+ENDCLASS.
+
+
+*---------------------------------------------------------------------*
+* 3. CLASS DEFINITION - PO DAO
+*---------------------------------------------------------------------*
+
+CLASS lcl_po_dao DEFINITION.
+
+  PUBLIC SECTION.
+
+    METHODS:
+      get_vendor
+        IMPORTING iv_vendor_id TYPE z25de_vendor_id
+        EXPORTING es_vendor TYPE z25vendor,
+
+      get_material
+        IMPORTING iv_material_id TYPE z25de_material_id
+        EXPORTING es_material TYPE z25material,
+
+      display_purchase_order
+        IMPORTING iv_po_id TYPE z25de_po_id
+        EXPORTING
+          es_header TYPE ty_po_header_display
+          et_items TYPE ty_po_item_table.
+
+ENDCLASS.
+
+
+*---------------------------------------------------------------------*
+* 4. CLASS DEFINITION - PO SERVICE
+*---------------------------------------------------------------------*
+
+CLASS lcl_po_service DEFINITION.
+
+  PUBLIC SECTION.
+
+    METHODS:
+      calculate_item_total
+        IMPORTING
+          iv_quantity TYPE z25de_quantity
+          iv_unit_price TYPE z25de_unit_price
+        RETURNING VALUE(rv_total) TYPE z25de_line_total,
+
+      calculate_po_total
+        IMPORTING
+          iv_po_id TYPE z25de_po_id
+        RETURNING VALUE(rv_total) TYPE z25de_total_amount,
+
+      create_purchase_order
+        IMPORTING
+          is_header TYPE z25po_header
+          is_item TYPE z25po_item
+        RETURNING VALUE(rv_success) TYPE abap_bool,
+
+      update_po_status
+        IMPORTING
+          iv_po_id TYPE z25de_po_id
+          iv_status TYPE z25de_status
+        RETURNING VALUE(rv_success) TYPE abap_bool.
+
+ENDCLASS.
+
+
+*---------------------------------------------------------------------*
+* 5. CLASS IMPLEMENTATION - PO VALIDATOR
+*---------------------------------------------------------------------*
+
+CLASS lcl_po_validator IMPLEMENTATION.
+
+  METHOD validate_vendor.
+
+    DATA lv_vendor_id TYPE z25de_vendor_id.
+
+    CLEAR rv_exists.
+
+    SELECT SINGLE vendor_id
+      INTO lv_vendor_id
+      FROM z25vendor
+      WHERE vendor_id = iv_vendor_id.
+
+    IF sy-subrc = 0.
+      rv_exists = abap_true.
+    ELSE.
+      rv_exists = abap_false.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD validate_material.
+
+    DATA lv_material_id TYPE z25de_material_id.
+
+    CLEAR rv_exists.
+
+    SELECT SINGLE material_id
+      INTO lv_material_id
+      FROM z25material
+      WHERE material_id = iv_material_id.
+
+    IF sy-subrc = 0.
+      rv_exists = abap_true.
+    ELSE.
+      rv_exists = abap_false.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD validate_quantity.
+
+    CLEAR rv_valid.
+
+    IF iv_quantity > 0.
+      rv_valid = abap_true.
+    ELSE.
+      rv_valid = abap_false.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+  METHOD validate_vendor_material.
+
+  DATA lv_vendor_id TYPE z25de_vendor_id.
+
+  CLEAR rv_exists.
+
+  SELECT SINGLE vendor_id
+    INTO lv_vendor_id
+    FROM z25vendor_mat1
+    WHERE vendor_id = iv_vendor_id
+      AND material_id = iv_material_id.
+
+  IF sy-subrc = 0.
+    rv_exists = abap_true.
+  ELSE.
+    rv_exists = abap_false.
+  ENDIF.
+
+ENDMETHOD.
+
+ENDCLASS.
+
+
+*---------------------------------------------------------------------*
+* 6. CLASS IMPLEMENTATION - PO DAO
+*---------------------------------------------------------------------*
+
+CLASS lcl_po_dao IMPLEMENTATION.
+
+  METHOD get_vendor.
+
+    CLEAR es_vendor.
+
+    SELECT SINGLE *
+      INTO es_vendor
+      FROM z25vendor
+      WHERE vendor_id = iv_vendor_id.
+
+  ENDMETHOD.
+
+
+  METHOD get_material.
+
+    CLEAR es_material.
+
+    SELECT SINGLE *
+      INTO es_material
+      FROM z25material
+      WHERE material_id = iv_material_id.
+
+  ENDMETHOD.
+
+
+  METHOD display_purchase_order.
+
+    CLEAR: es_header, et_items.
+
+    "Retrieve PO header and vendor name
+    SELECT SINGLE
+      h~po_id
+      h~vendor_id
+      v~vendor_name
+      h~po_date
+      h~delivery_date
+      h~currency
+      h~total_amount
+      h~status
+      INTO CORRESPONDING FIELDS OF es_header
+      FROM z25po_header AS h
+      INNER JOIN z25vendor AS v
+        ON h~vendor_id = v~vendor_id
+      WHERE h~po_id = iv_po_id.
+
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    "Retrieve all items and material names
+    SELECT
+      i~item_no
+      i~material_id
+      m~material_name
+      i~quantity
+      i~unit
+      i~unit_price
+      i~line_total
+      i~currency
+      INTO CORRESPONDING FIELDS OF TABLE et_items
+      FROM z25po_item AS i
+      INNER JOIN z25material AS m
+        ON i~material_id = m~material_id
+      WHERE i~po_id = iv_po_id
+      ORDER BY i~item_no.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+
+*---------------------------------------------------------------------*
+* 7. CLASS IMPLEMENTATION - PO SERVICE
+*---------------------------------------------------------------------*
+
+CLASS lcl_po_service IMPLEMENTATION.
+
+  METHOD calculate_item_total.
+
+    rv_total = iv_quantity * iv_unit_price.
+
+  ENDMETHOD.
+
+
+  METHOD calculate_po_total.
+
+    DATA lv_total TYPE z25de_total_amount.
+
+    CLEAR: rv_total, lv_total.
+
+    SELECT SUM( line_total )
+      INTO lv_total
+      FROM z25po_item
+      WHERE po_id = iv_po_id.
+
+    rv_total = lv_total.
+
+  ENDMETHOD.
+
+
+  METHOD create_purchase_order.
+
+    DATA: lv_existing_po TYPE z25de_po_id,
+          lv_total TYPE z25de_total_amount.
+
+    CLEAR rv_success.
+
+    "Check whether the PO header already exists
+    SELECT SINGLE po_id
+      INTO lv_existing_po
+      FROM z25po_header
+      WHERE po_id = is_header-po_id.
+
+    "Create header only for a new PO
+    IF sy-subrc <> 0.
+
+      INSERT z25po_header FROM is_header.
+
+      IF sy-subrc <> 0.
+        ROLLBACK WORK.
+        RETURN.
+      ENDIF.
+
+    ENDIF.
+
+    "Insert the new PO item
+    INSERT z25po_item FROM is_item.
+
+    IF sy-subrc <> 0.
+      ROLLBACK WORK.
+      RETURN.
+    ENDIF.
+
+    "Recalculate total for all items in this PO
+    SELECT SUM( line_total )
+      INTO lv_total
+      FROM z25po_item
+      WHERE po_id = is_header-po_id.
+
+    "Update header total
+    UPDATE z25po_header
+      SET total_amount = lv_total
+      WHERE po_id = is_header-po_id.
+
+    IF sy-subrc = 0.
+      COMMIT WORK AND WAIT.
+      rv_success = abap_true.
+    ELSE.
+      ROLLBACK WORK.
+      rv_success = abap_false.
+    ENDIF.
+
+  ENDMETHOD.
+
+  METHOD update_po_status.
+
+    DATA lv_current_status TYPE z25de_status.
+
+    CLEAR rv_success.
+
+    SELECT SINGLE status
+      INTO lv_current_status
+      FROM z25po_header
+      WHERE po_id = iv_po_id.
+
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
+
+    "Only New or Released POs can be cancelled; only New POs can be released
+    IF iv_status = 'R' AND lv_current_status <> 'N'.
+      RETURN.
+    ELSEIF iv_status = 'C'
+       AND lv_current_status <> 'N'
+       AND lv_current_status <> 'R'.
+      RETURN.
+    ENDIF.
+
+    UPDATE z25po_header
+      SET status = iv_status
+      WHERE po_id = iv_po_id.
+
+    IF sy-subrc = 0 AND sy-dbcnt = 1.
+      COMMIT WORK AND WAIT.
+      rv_success = abap_true.
+    ELSE.
+      ROLLBACK WORK.
+      rv_success = abap_false.
+    ENDIF.
+
+  ENDMETHOD.
+
+ENDCLASS.
+
+*---------------------------------------------------------------------*
+* 10. GLOBAL DATA DECLARATIONS
+*---------------------------------------------------------------------*
+
+DATA:
+  lo_validator TYPE REF TO lcl_po_validator,
+  lo_dao TYPE REF TO lcl_po_dao,
+  lo_service TYPE REF TO lcl_po_service,
+
+  lv_result TYPE abap_bool,
+
+  ls_vendor TYPE z25vendor,
+  ls_material TYPE z25material,
+
+  ls_header TYPE z25po_header,
+  ls_item TYPE z25po_item,
+  ls_existing_header TYPE z25po_header,
+
+  lv_item_total TYPE z25de_line_total,
+  lv_po_total TYPE z25de_total_amount,
+
+  lv_max_item_no TYPE z25de_item_no,
+  lv_next_item_no TYPE z25de_item_no,
+  lv_item_no_num TYPE i,
+  lv_existing_po TYPE z25de_po_id,
+
+  ls_display_header TYPE ty_po_header_display,
+  lt_display_items TYPE ty_po_item_table,
+  ls_display_item TYPE ty_po_item_display,
+
+  lv_new_status TYPE z25de_status,
+  lv_current_status TYPE z25de_status,
+
+  gt_po_overview TYPE ty_po_overview_table,
+  gt_po_item_overview TYPE ty_po_item_overview_table,
+  lo_alv TYPE REF TO cl_salv_table.
+
+*---------------------------------------------------------------------*
+* 8. SELECTION SCREEN - CREATE OR DISPLAY
+*---------------------------------------------------------------------*
+
+SELECTION-SCREEN BEGIN OF BLOCK b1 WITH FRAME.
+
+  PARAMETERS:
+    p_create RADIOBUTTON GROUP g1 DEFAULT 'X' USER-COMMAND act,
+    p_disp   RADIOBUTTON GROUP g1,
+    p_stat   RADIOBUTTON GROUP g1,
+    p_list   RADIOBUTTON GROUP g1,
+    p_items  RADIOBUTTON GROUP g1.
+
+SELECTION-SCREEN END OF BLOCK b1.
+
+SELECTION-SCREEN BEGIN OF BLOCK b2 WITH FRAME.
+
+  PARAMETERS:
+    p_poid   TYPE z25de_po_id MODIF ID crt,
+    p_vendor TYPE z25de_vendor_id MODIF ID crt,
+    p_pdate  TYPE datum MODIF ID crt,
+    p_ddate  TYPE datum MODIF ID crt,
+    p_mat    TYPE z25de_material_id MODIF ID crt,
+    p_qty    TYPE z25de_quantity MODIF ID crt.
+
+SELECTION-SCREEN END OF BLOCK b2.
+
+SELECTION-SCREEN BEGIN OF BLOCK b3 WITH FRAME.
+
+  PARAMETERS:
+    p_view TYPE z25de_po_id MODIF ID dsp.
+
+SELECTION-SCREEN END OF BLOCK b3.
+
+SELECTION-SCREEN BEGIN OF BLOCK b4 WITH FRAME.
+
+  PARAMETERS:
+    p_spoid TYPE z25de_po_id MODIF ID stt,
+    p_rel RADIOBUTTON GROUP g2 DEFAULT 'X' MODIF ID stt,
+    p_canc RADIOBUTTON GROUP g2 MODIF ID stt.
+
+SELECTION-SCREEN END OF BLOCK b4.
+
+SELECTION-SCREEN BEGIN OF BLOCK b5 WITH FRAME.
+
+  PARAMETERS:
+    p_fvend TYPE z25de_vendor_id MODIF ID flt,
+    p_fstat TYPE z25de_status MODIF ID flt.
+
+  SELECT-OPTIONS:
+    s_podat FOR sy-datum MODIF ID flt.
+
+SELECTION-SCREEN END OF BLOCK b5.
+
+SELECTION-SCREEN BEGIN OF BLOCK b6 WITH FRAME.
+  PARAMETERS:
+    p_ipoid TYPE z25de_po_id MODIF ID itf,
+    p_ivend TYPE z25de_vendor_id MODIF ID itf,
+    p_imat  TYPE z25de_material_id MODIF ID itf.
+SELECTION-SCREEN END OF BLOCK b6.
+
+
+*---------------------------------------------------------------------*
+* 9. SELECTION SCREEN DYNAMIC FIELD CONTROL
+*---------------------------------------------------------------------*
+
+AT SELECTION-SCREEN OUTPUT.
+
+  LOOP AT SCREEN.
+
+    IF screen-group1 = 'CRT'.
+
+      IF p_create = 'X'.
+        screen-active = 1.
+      ELSE.
+        screen-active = 0.
+      ENDIF.
+
+      MODIFY SCREEN.
+
+    ELSEIF screen-group1 = 'DSP'.
+
+      IF p_disp = 'X'.
+        screen-active = 1.
+      ELSE.
+        screen-active = 0.
+      ENDIF.
+
+      MODIFY SCREEN.
+
+    ELSEIF screen-group1 = 'STT'.
+
+      IF p_stat = 'X'.
+        screen-active = 1.
+      ELSE.
+        screen-active = 0.
+      ENDIF.
+
+      MODIFY SCREEN.
+
+    ELSEIF screen-group1 = 'FLT'.
+
+      IF p_list = 'X'.
+        screen-active = 1.
+      ELSE.
+        screen-active = 0.
+      ENDIF.
+
+      MODIFY SCREEN.
+
+    ELSEIF screen-group1 = 'ITF'.
+
+      IF p_items = 'X'.
+        screen-active = 1.
+      ELSE.
+        screen-active = 0.
+      ENDIF.
+
+      MODIFY SCREEN.
+
+    ENDIF.
+
+  ENDLOOP.
+
+
+
+
+
+*---------------------------------------------------------------------*
+* 11. MAIN PROGRAM
+*---------------------------------------------------------------------*
+
+START-OF-SELECTION.
+
+  CREATE OBJECT lo_validator.
+  CREATE OBJECT lo_dao.
+  CREATE OBJECT lo_service.
+
+
+*---------------------------------------------------------------------*
+* 12. PURCHASE ORDER OVERVIEW - ALV REPORT
+*---------------------------------------------------------------------*
+
+  IF p_list = 'X'.
+
+    CLEAR gt_po_overview.
+
+        SELECT
+      h~po_id
+      h~vendor_id
+      v~vendor_name
+      h~po_date
+      h~delivery_date
+      h~total_amount
+      h~currency
+      h~status
+      INTO CORRESPONDING FIELDS OF TABLE gt_po_overview
+      FROM z25po_header AS h
+      INNER JOIN z25vendor AS v
+        ON h~vendor_id = v~vendor_id
+      ORDER BY h~po_id.
+
+    "Filter by Vendor ID
+    IF p_fvend IS NOT INITIAL.
+
+      DELETE gt_po_overview
+        WHERE vendor_id <> p_fvend.
+
+    ENDIF.
+
+    "Filter by PO Status
+    IF p_fstat IS NOT INITIAL.
+
+      DELETE gt_po_overview
+        WHERE status <> p_fstat.
+
+    ENDIF.
+
+    "Filter by PO Date
+    IF s_podat[] IS NOT INITIAL.
+
+      DELETE gt_po_overview
+        WHERE po_date NOT IN s_podat.
+
+    ENDIF.
+
+    "Convert status codes into readable descriptions
+    LOOP AT gt_po_overview ASSIGNING FIELD-SYMBOL(<fs_po>).
+
+      CASE <fs_po>-status.
+
+        WHEN 'N'.
+          <fs_po>-status_text = 'New'.
+
+        WHEN 'R'.
+          <fs_po>-status_text = 'Released'.
+
+        WHEN 'C'.
+          <fs_po>-status_text = 'Cancelled'.
+
+        WHEN OTHERS.
+          <fs_po>-status_text = 'Unknown'.
+
+      ENDCASE.
+
+    ENDLOOP.
+
+    IF gt_po_overview IS INITIAL.
+      WRITE: / 'No purchase orders found.'.
+      RETURN.
+    ENDIF.
+
+    TRY.
+
+        cl_salv_table=>factory(
+          IMPORTING
+            r_salv_table = lo_alv
+          CHANGING
+            t_table      = gt_po_overview ).
+
+        lo_alv->get_functions( )->set_all( abap_true ).
+        lo_alv->get_columns( )->set_optimize( abap_true ).
+        lo_alv->display( ).
+
+      CATCH cx_salv_msg.
+        WRITE: / 'ERROR: Unable to display the Purchase Order ALV report.'.
+
+    ENDTRY.
+
+    RETURN.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 13. PURCHASE ORDER ITEM OVERVIEW - ALV REPORT
+*---------------------------------------------------------------------*
+
+  IF p_items = 'X'.
+
+    CLEAR gt_po_item_overview.
+
+    SELECT
+      h~po_id
+      h~vendor_id
+      v~vendor_name
+      h~po_date
+      i~item_no
+      i~material_id
+      m~material_name
+      i~quantity
+      i~unit
+      i~unit_price
+      i~line_total
+      i~currency
+      h~status
+      INTO CORRESPONDING FIELDS OF TABLE gt_po_item_overview
+      FROM z25po_header AS h
+      INNER JOIN z25vendor AS v
+        ON h~vendor_id = v~vendor_id
+      INNER JOIN z25po_item AS i
+        ON h~po_id = i~po_id
+      INNER JOIN z25material AS m
+        ON i~material_id = m~material_id
+      ORDER BY h~po_id i~item_no.
+
+    IF p_ipoid IS NOT INITIAL.
+      DELETE gt_po_item_overview WHERE po_id <> p_ipoid.
+    ENDIF.
+
+    IF p_ivend IS NOT INITIAL.
+      DELETE gt_po_item_overview WHERE vendor_id <> p_ivend.
+    ENDIF.
+
+    IF p_imat IS NOT INITIAL.
+      DELETE gt_po_item_overview WHERE material_id <> p_imat.
+    ENDIF.
+
+    LOOP AT gt_po_item_overview ASSIGNING FIELD-SYMBOL(<fs_item_po>).
+      CASE <fs_item_po>-status.
+        WHEN 'N'.
+          <fs_item_po>-status_text = 'New'.
+        WHEN 'R'.
+          <fs_item_po>-status_text = 'Released'.
+        WHEN 'C'.
+          <fs_item_po>-status_text = 'Cancelled'.
+        WHEN OTHERS.
+          <fs_item_po>-status_text = 'Unknown'.
+      ENDCASE.
+    ENDLOOP.
+
+    IF gt_po_item_overview IS INITIAL.
+      WRITE: / 'No purchase order items found for the selected filters.'.
+      RETURN.
+    ENDIF.
+
+    TRY.
+        cl_salv_table=>factory(
+          IMPORTING
+            r_salv_table = lo_alv
+          CHANGING
+            t_table      = gt_po_item_overview ).
+
+        lo_alv->get_functions( )->set_all( abap_true ).
+        lo_alv->get_columns( )->set_optimize( abap_true ).
+        lo_alv->display( ).
+
+      CATCH cx_salv_msg.
+        WRITE: / 'ERROR: Unable to display the Purchase Order Item ALV report.'.
+    ENDTRY.
+
+    RETURN.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 14. MANAGE PURCHASE ORDER STATUS
+*---------------------------------------------------------------------*
+
+  IF p_stat = 'X'.
+
+    IF p_spoid IS INITIAL.
+      WRITE: / 'ERROR: Please enter a Purchase Order ID.'.
+      RETURN.
+    ENDIF.
+
+    CLEAR lv_current_status.
+
+    SELECT SINGLE status
+      INTO lv_current_status
+      FROM z25po_header
+      WHERE po_id = p_spoid.
+
+    IF sy-subrc <> 0.
+      WRITE: / 'ERROR: Purchase Order does not exist:', p_spoid.
+      RETURN.
+    ENDIF.
+
+    IF p_rel = 'X'.
+      lv_new_status = 'R'.
+    ELSE.
+      lv_new_status = 'C'.
+    ENDIF.
+
+    CALL METHOD lo_service->update_po_status
+      EXPORTING
+        iv_po_id = p_spoid
+        iv_status = lv_new_status
+      RECEIVING
+        rv_success = lv_result.
+
+    IF lv_result = abap_true.
+      IF lv_new_status = 'R'.
+        WRITE: / 'Purchase Order released successfully:', p_spoid.
+      ELSE.
+        WRITE: / 'Purchase Order cancelled successfully:', p_spoid.
+      ENDIF.
+      WRITE: / 'Previous Status:', lv_current_status.
+      WRITE: / 'New Status:', lv_new_status.
+    ELSE.
+      IF lv_new_status = 'R'.
+        WRITE: / 'ERROR: Only a New PO can be released.'.
+      ELSE.
+        WRITE: / 'ERROR: Only a New or Released PO can be cancelled.'.
+      ENDIF.
+    ENDIF.
+
+    RETURN.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 15. DISPLAY PURCHASE ORDER MODE
+*---------------------------------------------------------------------*
+
+  IF p_disp = 'X'.
+
+    IF p_view IS INITIAL.
+      WRITE: / 'ERROR: Please enter a Purchase Order ID.'.
+      RETURN.
+    ENDIF.
+
+    CALL METHOD lo_dao->display_purchase_order
+      EXPORTING
+        iv_po_id = p_view
+      IMPORTING
+        es_header = ls_display_header
+        et_items = lt_display_items.
+
+    IF ls_display_header-po_id IS INITIAL.
+      WRITE: / 'Purchase Order does not exist:', p_view.
+      RETURN.
+    ENDIF.
+
+    WRITE: / '========================================'.
+    WRITE: / 'PURCHASE ORDER HEADER'.
+    WRITE: / '========================================'.
+
+    WRITE: / 'PO ID:', ls_display_header-po_id.
+    WRITE: / 'Vendor ID:', ls_display_header-vendor_id.
+    WRITE: / 'Vendor Name:', ls_display_header-vendor_name.
+    WRITE: / 'PO Date:', ls_display_header-po_date.
+    WRITE: / 'Delivery Date:', ls_display_header-delivery_date.
+    WRITE: / 'Total Amount:', ls_display_header-total_amount.
+    WRITE: / 'Currency:', ls_display_header-currency.
+    WRITE: / 'Status:', ls_display_header-status.
+
+    CASE ls_display_header-status.
+      WHEN 'N'.
+        WRITE: / 'Status Description: New'.
+      WHEN 'R'.
+        WRITE: / 'Status Description: Released'.
+      WHEN 'C'.
+        WRITE: / 'Status Description: Cancelled'.
+      WHEN OTHERS.
+        WRITE: / 'Status Description: Unknown'.
+    ENDCASE.
+
+    WRITE: / '========================================'.
+    WRITE: / 'PURCHASE ORDER ITEMS'.
+    WRITE: / '========================================'.
+
+    IF lt_display_items IS INITIAL.
+
+      WRITE: / 'No items found for this purchase order.'.
+
+    ELSE.
+
+      LOOP AT lt_display_items INTO ls_display_item.
+
+        WRITE: / '----------------------------------------'.
+        WRITE: / 'Item Number:', ls_display_item-item_no.
+        WRITE: / 'Material ID:', ls_display_item-material_id.
+        WRITE: / 'Material Name:', ls_display_item-material_name.
+        WRITE: / 'Quantity:', ls_display_item-quantity.
+        WRITE: / 'Unit:', ls_display_item-unit.
+        WRITE: / 'Unit Price:', ls_display_item-unit_price.
+        WRITE: / 'Line Total:', ls_display_item-line_total.
+        WRITE: / 'Currency:', ls_display_item-currency.
+
+      ENDLOOP.
+
+    ENDIF.
+
+    WRITE: / '========================================'.
+    WRITE: / 'PURCHASE ORDER DISPLAY COMPLETED'.
+
+    RETURN.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 16. CREATE PURCHASE ORDER MODE - REQUIRED INPUT CHECKS
+*---------------------------------------------------------------------*
+
+  IF p_poid IS INITIAL OR
+     p_vendor IS INITIAL OR
+     p_pdate IS INITIAL OR
+     p_ddate IS INITIAL OR
+     p_mat IS INITIAL.
+
+    WRITE: / 'ERROR: Enter all required purchase order fields.'.
+    RETURN.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 17. VALIDATE VENDOR
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_validator->validate_vendor
+    EXPORTING
+      iv_vendor_id = p_vendor
+    RECEIVING
+      rv_exists = lv_result.
+
+  IF lv_result = abap_false.
+    WRITE: / 'ERROR: Vendor does not exist:', p_vendor.
+    RETURN.
+  ENDIF.
+
+  WRITE: / 'Vendor validation successful.'.
+
+
+*---------------------------------------------------------------------*
+* 18. VALIDATE MATERIAL
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_validator->validate_material
+    EXPORTING
+      iv_material_id = p_mat
+    RECEIVING
+      rv_exists = lv_result.
+
+  IF lv_result = abap_false.
+    WRITE: / 'ERROR: Material does not exist:', p_mat.
+    RETURN.
+  ENDIF.
+
+  WRITE: / 'Material validation successful.'.
+
+
+*---------------------------------------------------------------------*
+* 19. VALIDATE QUANTITY
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_validator->validate_quantity
+    EXPORTING
+      iv_quantity = p_qty
+    RECEIVING
+      rv_valid = lv_result.
+
+  IF lv_result = abap_false.
+    WRITE: / 'ERROR: Quantity must be greater than zero.'.
+    RETURN.
+  ENDIF.
+
+  WRITE: / 'Quantity validation successful.'.
+
+
+*---------------------------------------------------------------------*
+* 20. VALIDATE DELIVERY DATE
+*---------------------------------------------------------------------*
+
+  IF p_ddate < p_pdate.
+    WRITE: / 'ERROR: Delivery date cannot be earlier than PO date.'.
+    RETURN.
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 21. RETRIEVE VENDOR DETAILS
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_dao->get_vendor
+    EXPORTING
+      iv_vendor_id = p_vendor
+    IMPORTING
+      es_vendor = ls_vendor.
+
+  IF ls_vendor-vendor_id IS INITIAL.
+    WRITE: / 'ERROR: Vendor details could not be retrieved.'.
+    RETURN.
+  ENDIF.
+
+  WRITE: / '----------------------------------------'.
+  WRITE: / 'VENDOR DETAILS'.
+  WRITE: / 'Vendor ID:', ls_vendor-vendor_id.
+  WRITE: / 'Vendor Name:', ls_vendor-vendor_name.
+  WRITE: / 'Vendor City:', ls_vendor-city.
+  WRITE: / 'Vendor Email:', ls_vendor-email.
+
+
+*---------------------------------------------------------------------*
+* 22. RETRIEVE MATERIAL DETAILS
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_dao->get_material
+    EXPORTING
+      iv_material_id = p_mat
+    IMPORTING
+      es_material = ls_material.
+
+  IF ls_material-material_id IS INITIAL.
+    WRITE: / 'ERROR: Material details could not be retrieved.'.
+    RETURN.
+  ENDIF.
+
+  WRITE: / '----------------------------------------'.
+  WRITE: / 'MATERIAL DETAILS'.
+  WRITE: / 'Material ID:', ls_material-material_id.
+  WRITE: / 'Material Name:', ls_material-material_name.
+  WRITE: / 'Unit:', ls_material-unit.
+  WRITE: / 'Unit Price:', ls_material-price.
+  WRITE: / 'Currency:', ls_material-currency.
+
+
+*---------------------------------------------------------------------*
+* 23. VALIDATE VENDOR-MATERIAL RELATIONSHIP
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_validator->validate_vendor_material
+    EXPORTING
+      iv_vendor_id = p_vendor
+      iv_material_id = p_mat
+    RECEIVING
+      rv_exists = lv_result.
+
+  IF lv_result = abap_false.
+    WRITE: / 'ERROR: This vendor has not previously supplied this material.'.
+    RETURN.
+  ENDIF.
+
+  WRITE: / 'Vendor-material relationship validated.'.
+
+
+*---------------------------------------------------------------------*
+* 24. CHECK EXISTING PURCHASE ORDER
+*---------------------------------------------------------------------*
+
+  CLEAR ls_existing_header.
+
+  SELECT SINGLE *
+    INTO ls_existing_header
+    FROM z25po_header
+    WHERE po_id = p_poid.
+
+  IF sy-subrc = 0.
+
+    IF ls_existing_header-vendor_id <> p_vendor.
+      WRITE: / 'ERROR: This PO belongs to another vendor.'.
+      RETURN.
+    ENDIF.
+
+    IF ls_existing_header-currency <> ls_material-currency.
+      WRITE: / 'ERROR: Material currency does not match PO currency.'.
+      RETURN.
+    ENDIF.
+
+    IF ls_existing_header-status = 'C'.
+      WRITE: / 'ERROR: Cannot add items to a cancelled purchase order.'.
+      RETURN.
+    ENDIF.
+
+    IF ls_existing_header-status = 'R'.
+      WRITE: / 'ERROR: Cannot add items to a released purchase order.'.
+      RETURN.
+    ENDIF.
+
+    WRITE: / 'Existing PO found. New item will be added.'.
+
+  ELSE.
+
+    WRITE: / 'New PO. Header and item will be created.'.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 25. CALCULATE ITEM TOTAL
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_service->calculate_item_total
+    EXPORTING
+      iv_quantity = p_qty
+      iv_unit_price = ls_material-price
+    RECEIVING
+      rv_total = lv_item_total.
+
+  WRITE: / '----------------------------------------'.
+  WRITE: / 'ITEM CALCULATION'.
+  WRITE: / 'Quantity:', p_qty.
+  WRITE: / 'Unit Price:', ls_material-price.
+  WRITE: / 'Item Total:', lv_item_total.
+
+
+*---------------------------------------------------------------------*
+* 26. GENERATE ITEM NUMBER DYNAMICALLY
+*---------------------------------------------------------------------*
+
+  CLEAR: lv_max_item_no,
+         lv_next_item_no,
+         lv_item_no_num.
+
+  SELECT MAX( item_no )
+    INTO lv_max_item_no
+    FROM z25po_item
+    WHERE po_id = p_poid.
+
+  IF lv_max_item_no IS INITIAL.
+
+    lv_next_item_no = '00010'.
+
+  ELSE.
+
+    lv_item_no_num = lv_max_item_no.
+    lv_item_no_num = lv_item_no_num + 10.
+
+    IF lv_item_no_num > 99990.
+      WRITE: / 'ERROR: Maximum PO item limit reached.'.
+      RETURN.
+    ENDIF.
+
+    lv_next_item_no = lv_item_no_num.
+
+  ENDIF.
+
+  WRITE: / 'Generated Item Number:', lv_next_item_no.
+
+
+*---------------------------------------------------------------------*
+* 27. PREPARE PURCHASE ORDER HEADER
+*---------------------------------------------------------------------*
+
+  CLEAR ls_header.
+
+  ls_header-mandt = sy-mandt.
+  ls_header-po_id = p_poid.
+  ls_header-vendor_id = p_vendor.
+  ls_header-po_date = p_pdate.
+  ls_header-delivery_date = p_ddate.
+  ls_header-currency = ls_material-currency.
+  ls_header-total_amount = lv_item_total.
+  ls_header-status = 'N'.
+
+
+*---------------------------------------------------------------------*
+* 28. PREPARE PURCHASE ORDER ITEM
+*---------------------------------------------------------------------*
+
+  CLEAR ls_item.
+
+  ls_item-mandt = sy-mandt.
+  ls_item-po_id = p_poid.
+  ls_item-item_no = lv_next_item_no.
+  ls_item-material_id = p_mat.
+  ls_item-quantity = p_qty.
+  ls_item-unit = ls_material-unit.
+  ls_item-unit_price = ls_material-price.
+  ls_item-line_total = lv_item_total.
+  ls_item-currency = ls_material-currency.
+
+
+*---------------------------------------------------------------------*
+* 29. CREATE PURCHASE ORDER / ADD NEW ITEM
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_service->create_purchase_order
+    EXPORTING
+      is_header = ls_header
+      is_item = ls_item
+    RECEIVING
+      rv_success = lv_result.
+
+  IF lv_result = abap_true.
+
+    WRITE: / '----------------------------------------'.
+    WRITE: / 'PURCHASE ORDER ITEM ADDED SUCCESSFULLY'.
+    WRITE: / 'PO ID:', p_poid.
+    WRITE: / 'Vendor ID:', p_vendor.
+    WRITE: / 'Item Number:', lv_next_item_no.
+    WRITE: / 'Material ID:', p_mat.
+    WRITE: / 'Quantity:', p_qty.
+    WRITE: / 'Item Total:', lv_item_total.
+
+  ELSE.
+
+    WRITE: / '----------------------------------------'.
+    WRITE: / 'ERROR: Purchase Order processing failed.'.
+    WRITE: / 'Check PO ID and item details.'.
+    RETURN.
+
+  ENDIF.
+
+
+*---------------------------------------------------------------------*
+* 30. DISPLAY UPDATED PURCHASE ORDER TOTAL
+*---------------------------------------------------------------------*
+
+  CALL METHOD lo_service->calculate_po_total
+    EXPORTING
+      iv_po_id = p_poid
+    RECEIVING
+      rv_total = lv_po_total.
+
+  WRITE: / '----------------------------------------'.
+  WRITE: / 'PURCHASE ORDER SUMMARY'.
+  WRITE: / 'PO ID:', p_poid.
+  WRITE: / 'Total Amount:', lv_po_total.
+  WRITE: / 'Currency:', ls_material-currency.
+  WRITE: / 'Purchase Order processing completed.'.

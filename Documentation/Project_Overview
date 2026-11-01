@@ -1,0 +1,33 @@
+PROJECT OVERVIEW — SAP ABAP PURCHASE ORDER MANAGEMENT SYSTEM
+
+Program: Z25_PO_MANAGEMENT
+Package: Z25_pack_tijiya
+
+INTRODUCTION
+The Purchase Order Management System is a custom SAP ABAP application for maintaining vendor, material and purchase order information. It demonstrates PO creation and display, input validation, amount calculations, status processing and ALV reporting where present in the activated program.
+
+OBJECTIVES
+- Design custom tables for vendors, materials, vendor-material relationships, PO headers and PO items.
+- Apply ABAP OOP using local classes.
+- Validate vendor, material, quantity and vendor-material inputs.
+- Calculate item totals and PO totals.
+- Enforce PO status transition rules.
+- Present information through structured reports.
+
+TOOLS
+SAP ABAP, SAP GUI, SE11, SE16N, SE38, Open SQL and CL_SALV_TABLE (where implemented).
+
+LOCAL CLASSES
+LCL_PO_VALIDATOR: validates vendor, material, quantity and vendor-material relationship.
+LCL_PO_DAO: retrieves vendor, material and PO information.
+LCL_PO_SERVICE: calculates totals, creates POs and updates statuses.
+
+STATUS RULES
+N = New; R = Released; C = Cancelled.
+New can be released or cancelled. Released can be cancelled but cannot be released again. Cancelled is terminal in the current workflow.
+
+EXECUTION
+Activate required DDIC objects and master data. Execute Z25_PO_MANAGEMENT from SE38. Use SE16N to verify saved records.
+
+SCOPE NOTE
+This is a custom learning/application-development project, not a complete SAP MM implementation. Verify all report options in the active program before claiming them as completed.

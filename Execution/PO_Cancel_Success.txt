@@ -1,0 +1,5 @@
+01.11.2026              Purchase Order Management System using OOPs                      1
+------------------------------------------------------------------------------------------
+Purchase Order cancelled successfully: PO1012
+Previous Status: N
+New Status: C

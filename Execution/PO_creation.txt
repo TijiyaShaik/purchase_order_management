@@ -1,0 +1,40 @@
+01.11.2026              Purchase Order Management System using OOPs                      1
+------------------------------------------------------------------------------------------
+Vendor validation successful.
+Material validation successful.
+Quantity validation successful.
+----------------------------------------
+VENDOR DETAILS
+Vendor ID: V1004
+Vendor Name: SMART SYSTEMS
+Vendor City: PUNE
+Vendor Email: SMART@GMAIL.COM
+----------------------------------------
+MATERIAL DETAILS
+Material ID: M1004
+Material Name: MONITOR
+Unit: EA
+Unit Price:           12.000,00
+Currency: INR
+Vendor-material relationship validated.
+New PO. Header and item will be created.
+----------------------------------------
+ITEM CALCULATION
+Quantity:                2
+Unit Price:           12.000,00
+Item Total:           24.000,00
+Generated Item Number: 00010
+----------------------------------------
+PURCHASE ORDER ITEM ADDED SUCCESSFULLY
+PO ID: PO9001
+Vendor ID: V1004
+Item Number: 00010
+Material ID: M1004
+Quantity:                2
+Item Total:           24.000,00
+----------------------------------------
+PURCHASE ORDER SUMMARY
+PO ID: PO9001
+Total Amount:           24.000,00
+Currency: INR
+Purchase Order processing completed.

@@ -1,0 +1,37 @@
+01.11.2026                                                               Purchase Order Management System using OOPs                                                                      1
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+========================================
+PURCHASE ORDER HEADER
+========================================
+PO ID: PO9001
+Vendor ID: V1004
+Vendor Name: SMART SYSTEMS
+PO Date: 31.10.2026
+Delivery Date: 15.11.2026
+Total Amount:           69.000,00
+Currency: INR
+Status: C
+Status Description: Cancelled
+========================================
+PURCHASE ORDER ITEMS
+========================================
+----------------------------------------
+Item Number: 00010
+Material ID: M1004
+Material Name: MONITOR
+Quantity:                2
+Unit: EA
+Unit Price:           12.000,00
+Line Total:           24.000,00
+Currency: INR
+----------------------------------------
+Item Number: 00020
+Material ID: M1006
+Material Name: DESKTOP COMPUTER
+Quantity:                1
+Unit: EA
+Unit Price:           45.000,00
+Line Total:           45.000,00
+Currency: INR
+========================================
+PURCHASE ORDER DISPLAY COMPLETED

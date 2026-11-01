@@ -1,0 +1,35 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------
+|PO ID |Vendor Id|Vendor Name         |Date      |Item No|Matr name|Material Name   |Quantity|Unit|    Price|     Total|Currency|Status|Char15   |
+--------------------------------------------------------------------------------------------------------------------------------------------------
+|PO1001|V1004    |SMART SYSTEMS       |31.10.2026|     10|M1001    |LAPTOP          |       2|EA  |50.000,00|100.000,00|INR     |      |Unknown  |
+|PO1001|V1004    |SMART SYSTEMS       |31.10.2026|     20|M1009    |WEBCAM          |       1|EA  | 3.500,00|  3.500,00|INR     |      |Unknown  |
+|PO1001|V1004    |SMART SYSTEMS       |31.10.2026|     30|M1001    |LAPTOP          |       2|EA  |50.000,00|100.000,00|INR     |      |Unknown  |
+|PO1002|V1001    |ABC TECHNOLOGIES    |31.10.2026|     10|M1006    |DESKTOP COMPUTER|       1|EA  |45.000,00| 45.000,00|INR     |      |Unknown  |
+|PO1002|V1001    |ABC TECHNOLOGIES    |31.10.2026|     20|M1002    |KEYBOARD        |       2|EA  | 1.500,00|  3.000,00|INR     |      |Unknown  |
+|PO1003|V1008    |NEXTGEN SOLUTIONS   |31.10.2026|     10|M1004    |MONITOR         |       2|EA  |12.000,00| 24.000,00|INR     |      |Unknown  |
+|PO1003|V1008    |NEXTGEN SOLUTIONS   |31.10.2026|     20|M1005    |PRINTER         |       1|EA  | 8.000,00|  8.000,00|INR     |      |Unknown  |
+|PO1004|V1003    |GLOBAL TRADERS      |31.10.2026|     10|M1008    |HEADPHONES      |       3|EA  | 2.000,00|  6.000,00|INR     |      |Unknown  |
+|PO1004|V1003    |GLOBAL TRADERS      |31.10.2026|     20|M1003    |MOUSE           |       4|EA  |   500,00|  2.000,00|INR     |      |Unknown  |
+|PO1005|V1010    |UNIVERSAL TRADERS   |31.10.2026|     10|M1018    |PROJECTOR       |       1|EA  |35.000,00| 35.000,00|INR     |      |Unknown  |
+|PO1005|V1010    |UNIVERSAL TRADERS   |31.10.2026|     20|M1015    |SSD 512GB       |       1|EA  | 4.500,00|  4.500,00|INR     |      |Unknown  |
+|PO1005|V1010    |UNIVERSAL TRADERS   |31.10.2026|     30|M1007    |USB CABLE       |      10|EA  |   250,00|  2.500,00|INR     |      |Unknown  |
+|PO1006|V1006    |SUNRISE TECHNOLOGIES|31.10.2026|     10|M1011    |SMART PHONE     |       1|EA  |25.000,00| 25.000,00|INR     |      |Unknown  |
+|PO1006|V1006    |SUNRISE TECHNOLOGIES|31.10.2026|     20|M1003    |MOUSE           |      14|EA  |   500,00|  7.000,00|INR     |      |Unknown  |
+|PO1007|V1002    |XYZ SOLUTIONS       |31.10.2026|     10|M1012    |TABLET          |       2|EA  |18.000,00| 36.000,00|INR     |      |Unknown  |
+|PO1007|V1002    |XYZ SOLUTIONS       |31.10.2026|     20|M1013    |WIFI ROUTER     |       1|EA  | 3.000,00|  3.000,00|INR     |      |Unknown  |
+|PO1008|V1009    |BRIGHT COMPUTERS    |31.10.2026|     10|M1019    |UPS             |       1|EA  | 5.500,00|  5.500,00|INR     |      |Unknown  |
+|PO1008|V1009    |BRIGHT COMPUTERS    |31.10.2026|     20|M1007    |USB CABLE       |       2|EA  |   250,00|    500,00|INR     |      |Unknown  |
+|PO1009|V1005    |TECH WORLD          |31.10.2026|     10|M1008    |HEADPHONES      |       1|EA  |35.000,00| 35.000,00|INR     |      |Unknown  |
+|PO1009|V1005    |TECH WORLD          |31.10.2026|     20|M1008    |HEADPHONES      |       2|EA  | 2.000,00|  4.000,00|INR     |      |Unknown  |
+|PO1010|V1007    |PRIME ELECTRONICS   |31.10.2026|     10|M1011    |SMART PHONE     |       1|EA  |25.000,00| 25.000,00|INR     |      |Unknown  |
+|PO1010|V1007    |PRIME ELECTRONICS   |31.10.2026|     20|M1015    |SSD 512GB       |       1|EA  | 4.500,00|  4.500,00|INR     |      |Unknown  |
+|PO1010|V1007    |PRIME ELECTRONICS   |31.10.2026|     30|M1003    |MOUSE           |       2|EA  |   500,00|  1.000,00|INR     |      |Unknown  |
+|PO1011|V1004    |SMART SYSTEMS       |31.10.2026|     10|M1001    |LAPTOP          |       2|EA  |50.000,00|100.000,00|INR     |C     |Cancelled|
+|PO1012|V1004    |SMART SYSTEMS       |31.10.2026|     10|M1001    |LAPTOP          |       2|EA  |50.000,00|100.000,00|INR     |C     |Cancelled|
+|PO1012|V1004    |SMART SYSTEMS       |31.10.2026|     20|M1009    |WEBCAM          |       1|EA  | 3.500,00|  3.500,00|INR     |C     |Cancelled|
+|PO1014|V1001    |ABC TECHNOLOGIES    |31.10.2026|     10|M1001    |LAPTOP          |       2|EA  |50.000,00|100.000,00|INR     |C     |Cancelled|
+|PO1014|V1001    |ABC TECHNOLOGIES    |31.10.2026|     20|M1002    |KEYBOARD        |       2|EA  | 1.500,00|  3.000,00|INR     |C     |Cancelled|
+|PO1016|V1004    |SMART SYSTEMS       |31.10.2026|     10|M1004    |MONITOR         |       2|EA  |12.000,00| 24.000,00|INR     |N     |New      |
+|PO9001|V1004    |SMART SYSTEMS       |31.10.2026|     10|M1004    |MONITOR         |       2|EA  |12.000,00| 24.000,00|INR     |C     |Cancelled|
+|PO9001|V1004    |SMART SYSTEMS       |31.10.2026|     20|M1006    |DESKTOP COMPUTER|       1|EA  |45.000,00| 45.000,00|INR     |C     |Cancelled|
+--------------------------------------------------------------------------------------------------------------------------------------------------

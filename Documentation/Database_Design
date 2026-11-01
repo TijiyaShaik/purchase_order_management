@@ -1,0 +1,35 @@
+DATABASE DESIGN — SAP ABAP PURCHASE ORDER MANAGEMENT SYSTEM
+
+Z25VENDOR — Vendor Master
+MANDT (key), VENDOR_ID (key), VENDOR_NAME, CITY, EMAIL.
+
+Z25MATERIAL — Material Master
+MANDT (key), MATERIAL_ID (key), MATERIAL_NAME, UNIT, PRICE, CURRENCY.
+
+Z25VENDOR_MAT1 — Vendor-Material Relationship
+MANDT (key), VENDOR_ID (key), MATERIAL_ID (key).
+Stores permitted vendor/material pairs.
+
+Z25PO_HEADER — Purchase Order Header
+MANDT (key), PO_ID (key), VENDOR_ID, PO_DATE, DELIVERY_DATE, CURRENCY, TOTAL_AMOUNT, STATUS.
+
+Z25PO_ITEM — Purchase Order Items
+MANDT (key), PO_ID (key), ITEM_NO (key), MATERIAL_ID, QUANTITY, UNIT, UNIT_PRICE, LINE_TOTAL, CURRENCY.
+
+PRIMARY KEYS
+Z25VENDOR: MANDT + VENDOR_ID
+Z25MATERIAL: MANDT + MATERIAL_ID
+Z25VENDOR_MAT1: MANDT + VENDOR_ID + MATERIAL_ID
+Z25PO_HEADER: MANDT + PO_ID
+Z25PO_ITEM: MANDT + PO_ID + ITEM_NO
+
+LOGICAL RELATIONSHIPS
+Vendor to PO Header through VENDOR_ID.
+PO Header to PO Item through PO_ID.
+Material to PO Item through MATERIAL_ID.
+Vendor and Material to Z25VENDOR_MAT1 through VENDOR_ID and MATERIAL_ID.
+
+DATA INTEGRITY
+Vendor and material should exist; vendor/material pair must be registered; quantity must be positive; delivery date must not precede PO date; item number must be unique within a PO; header total should equal sum of item line totals.
+
+Verify active field definitions and currency/quantity reference fields in SE11.

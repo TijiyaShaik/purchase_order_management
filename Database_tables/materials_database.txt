@@ -1,0 +1,24 @@
+---------------------------------------------------
+|Matr name|Material Name      |BUn|     Price|Crcy|
+---------------------------------------------------
+|M1001    |LAPTOP             |EA |50.000,00 |INR |
+|M1002    |KEYBOARD           |EA | 1.500,00 |INR |
+|M1003    |MOUSE              |EA |   500,00 |INR |
+|M1004    |MONITOR            |EA |12.000,00 |INR |
+|M1005    |PRINTER            |EA | 8.000,00 |INR |
+|M1006    |DESKTOP COMPUTER   |EA |45.000,00 |INR |
+|M1007    |USB CABLE          |EA |   250,00 |INR |
+|M1008    |HEADPHONES         |EA | 2.000,00 |INR |
+|M1009    |WEBCAM             |EA | 3.500,00 |INR |
+|M1010    |EXTERNAL HARD DISK |EA | 6.000,00 |INR |
+|M1011    |SMART PHONE        |EA |25.000,00 |INR |
+|M1012    |TABLET             |EA |18.000,00 |INR |
+|M1013    |WIFI ROUTER        |EA | 3.000,00 |INR |
+|M1014    |POWER BANK         |EA | 1.500,00 |INR |
+|M1015    |SSD 512GB          |EA | 4.500,00 |INR |
+|M1016    |RAM 16GB           |EA | 3.500,00 |INR |
+|M1017    |GRAPHICS CARD      |EA |25.000,00 |INR |
+|M1018    |PROJECTOR          |EA |35.000,00 |INR |
+|M1019    |UPS                |EA | 5.500,00 |INR |
+|M1020    |MECHANICAL KEYBOARD|EA | 4.000,00 |INR |
+---------------------------------------------------

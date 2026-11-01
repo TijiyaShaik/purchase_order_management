@@ -313,50 +313,72 @@ The application can be tested using the following scenarios:
 ---
 ## Repository Structure
 
-purchase_order_management/
-│
-├── README.md
-│
-├── database_tables/
-│   ├── materials_database.txt
-│   ├── material-structure.png
-│   ├── po_header-database.txt
-│   ├── PO_header-structure.png
-│   ├── po_item-database.txt
-│   ├── PO_item-structure.png
-│   ├── vend-mat-structure.png
-│   ├── vend-mat-database.txt
-│   ├── vendor_database.txt
-│   └── vendor-structure.png
-│
-├── execution/
-│   ├── Invalid_Status_Transition.txt
-│   ├── PO_Add_Multiple_Items.txt
-│   ├── PO_Cancel_Success.txt
-│   ├── PO_creation.txt
-│   ├── PO_display.txt
-│   ├── PO_Header_Database-rel.txt
-│   ├── PO_Item_Database-rel.txt
-│   ├── PO_Item_Overview_ALV.txt
-│   ├── PO_Overview_ALV.txt
-│   └── PO_Release_Success.txt
-│
-├── Selection_screens/
-│   ├── Create_PO_Selection_Screen.png
-│   ├── Display_PO_Selection_Screen.png
-│   ├── PO_Item_Selection_Screen.png
-│   ├── PO_Overview_Selection_Screen.png
-│   └── PO_Status_Selection_Screen.png
-│
-├── Filters/
-│   ├── PO_Item_PO_Filter.txt
-│   ├── PO_Item_Vendor_Filter.txt
-│   ├── PO_Overview_Date_Filter.txt
-│   ├── PO_Overview_Status_Filter.txt
-│   └── PO_Overview_Vendor_Filter.txt
-│
-└── source_code/
-    └── Z25_PO_MANAGEMENT
+## 📁 Repository Structure
+
+**`purchase_order_management/`**
+
+The project is organized into the following directories:
+
+### 📂 1. database_tables
+
+Contains database records and table structure screenshots.
+
+* `materials_database.txt`
+* `material-structure.png`
+* `po_header-database.txt`
+* `PO_header-structure.png`
+* `po_item-database.txt`
+* `PO_item-structure.png`
+* `vend-mat-structure.png`
+* `vend-mat-database.txt`
+* `vendor_database.txt`
+* `vendor-structure.png`
+
+### 📂 2. execution
+
+Contains program execution outputs, test scenarios, and validation results.
+
+* `Invalid_Status_Transition.txt`
+* `PO_Add_Multiple_Items.txt`
+* `PO_Cancel_Success.txt`
+* `PO_creation.txt`
+* `PO_display.txt`
+* `PO_Header_Database-rel.txt`
+* `PO_Item_Database-rel.txt`
+* `PO_Item_Overview_ALV.txt`
+* `PO_Overview_ALV.txt`
+* `PO_Release_Success.txt`
+
+### 📂 3. Selection_screens
+
+Contains screenshots of different purchase order selection screens.
+
+* `Create_PO_Selection_Screen.png`
+* `Display_PO_Selection_Screen.png`
+* `PO_Item_Selection_Screen.png`
+* `PO_Overview_Selection_Screen.png`
+* `PO_Status_Selection_Screen.png`
+
+### 📂 4. Filters
+
+Contains filter implementations for purchase order and vendor-related data.
+
+* `PO_Item_PO_Filter.txt`
+* `PO_Item_Vendor_Filter.txt`
+* `PO_Overview_Date_Filter.txt`
+* `PO_Overview_Status_Filter.txt`
+* `PO_Overview_Vendor_Filter.txt`
+
+### 📂 5. source_code
+
+Contains the main SAP ABAP project implementation.
+
+* `Z25_PO_MANAGEMENT`
+
+### 📄 README.md
+
+Provides the project overview, features, technologies used, implementation details, and application screenshots.
+
 
 ## Future Enhancements
 
